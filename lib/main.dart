@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -39,18 +41,32 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  static String path = '/storage/sdcard1/muisc/';
+  String path = '/storage/sdcard1/muisc';
+  static Directory dir = Directory('/storage/sdcard1/muisc');
   bool isPlaying = false;
 
-  Directory dir = Directory(path);
+
   AudioPlayer audioPlayer = AudioPlayer();
+
+  static List<FileSystemEntity> files = dir.listSync();
+  //TESTING
+// String xd = files[0].path;
+
+ List<String> items = [];
+
+
+
 
   @override
   initState() {
     super.initState();
 
-  }
+    files.forEach((f) => items.add(f.path));
 
+    //print(stuff.length);
+
+
+  }
 
   Future loadMusic() async {
     audioPlayer.play('${path}01 Cafe Belga.mp3',
@@ -60,7 +76,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   }
 
-
   void stopOrResume(){
     setState(() {
       isPlaying ? isPlaying= false: isPlaying = true;
@@ -69,13 +84,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 
-  final items = List<String>.generate(10000, (i) => "Item $i");
+  //final items = List<String>.generate(10000, (i) => "Item $i");
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Sensor Player'),
+          title: Text('Sensor Player '),
           actions: <Widget>[
             FlatButton.icon(
                 onPressed: showList,
@@ -88,7 +103,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
         ),
-        floatingActionButton: new FloatingActionButton(
+        /*body:  Center(
+          child: ListView.separated(
+          padding: const EdgeInsets.all(8),
+           itemCount: items.length,
+          itemBuilder: (context, index) {
+               return ListTile(
+                    title: Text('${items[index]}'),
+                onTap: null,
+              ) ;
+
+            },
+               separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.indigo, thickness: 1.5,)
+           )
+          ),
+
+         */
+          floatingActionButton: new FloatingActionButton(
 
           child: isPlaying ? Icon(Icons.pause): Icon(Icons.play_arrow),
           onPressed:  stopOrResume
