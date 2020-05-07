@@ -24,6 +24,7 @@ dependencies:
   audioplayers: ^0.15.1
   path_provider: ^1.6.7
   path: ^1.6.4
+  flutter_visualizers: ^0.0.1
 
 
 
@@ -41,7 +42,34 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
+  fonts:
+    - family: Galada
+      fonts:
+        - asset: assets/Galada-Regular.ttf
+    - family: IndieFlower
+      fonts:
+        - asset: assets/IndieFlower-Regular.ttf
+    - family: PermanentMarker
+      fonts:
+        - asset: assets/PermanentMarker-Regular.ttf
+    - family: ShadowsIntoLight
+      fonts:
+        - asset: assets/ShadowsIntoLight-Regular.ttf
+    - family: Bangers
+      fonts:
+        - asset: assets/Bangers-Regular.ttf
+    - family: Chewy
+      fonts:
+        - asset: assets/Chewy-Regular.ttf
+    - family: FredokaOne
+      fonts:
+          - asset: assets/FredokaOne-Regular.ttf
+    - family: PressStart2P
+      fonts:
+        - asset: assets/PressStart2P-Regular.ttf
+    - family: Sriracha
+      fonts:
+        - asset: assets/Sriracha-Regular.ttf
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
