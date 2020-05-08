@@ -28,6 +28,13 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
+  String name;
+  bool s = false; //TODO test it!
+  void setName(String name) => this.name = name;
+  bool say() {
+    //TODO make reset button state
+    return s;
+  }
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -47,6 +54,12 @@ class _MyHomePageState extends State<MyHomePage> {
   initState() {
     super.initState();
     listInit();
+  }
+
+  void changeState() {
+    //TODO Try another solution
+
+    isPlaying = widget.say();
   }
 
   void listInit() {
