@@ -28,38 +28,31 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
-  String name;
-  bool s = false; //TODO test it!
-  void setName(String name) => this.name = name;
-  bool say() {
-    //TODO make reset button state
-    return s;
-  }
+  bool remote = true;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static Directory dir = Directory('/storage/sdcard1/muisc');
+  static Directory dir = Directory('/storage/sdcard1/muisc/');
   static List<FileSystemEntity> files = dir.listSync();
   final List<String> items = [];
 
   bool isPlaying = false;
+  Duration duration, position;
+  int startingPoint = 0;
 
   AudioPlayer audioPlayer = AudioPlayer();
-  String currentFile;
 
   @override
   initState() {
     super.initState();
     listInit();
-  }
+    audioComplete();
+    audioPosition();
+    audioDuration();
 
-  void changeState() {
-    //TODO Try another solution
-
-    isPlaying = widget.say();
   }
 
   void listInit() {
@@ -67,29 +60,67 @@ class _MyHomePageState extends State<MyHomePage> {
         items.add(f.path.substring(23).replaceAll(RegExp('([.]mp3)'), '')));
   }
 
-  setCurrentFile(String item) {
-    this.currentFile = item;
+  audioDuration() async {
+    audioPlayer.onDurationChanged.listen((Duration d) {
+      print('Max duration: $d');
+      setState(() => duration = d);
+    });
   }
 
-  String getFile() {
-    return currentFile;
+  audioPosition() async {
+    audioPlayer.onAudioPositionChanged.listen((Duration p) {
+      print('Current position: $p');
+      setState(() => position = p);
+
+    });
   }
 
-  Future loadMusic() async {
-    //audioPlayer.play('$PATH$currentFile', isLocal: true, volume: 1.0);
+  /*onComplete(int index) async {
 
-    if (!isPlaying) audioPlayer.stop();
+    audioPlayer.play('${dir.path}${items[index]}.mp3',
+        isLocal: true, volume: 1.0);
+  }
+
+   */
+
+  audioComplete() {
+    audioPlayer.onPlayerCompletion.listen((event) {
+      startingPoint++;
+      loadMusic(startingPoint);
+      setState(() {
+        position = duration;
+      });
+    });
+  }
+
+  loadMusic(int index) async {
+    if (isPlaying) {
+      audioPlayer.play('${dir.path}${items[index]}.mp3',
+          isLocal: true, volume: 1.0);
+    } else {
+      audioPlayer.pause();
+    }
   }
 
   void stopOrResume() {
     setState(() {
       isPlaying ? isPlaying = false : isPlaying = true;
-      loadMusic();
+      loadMusic(startingPoint);
     });
+
+  }
+
+  playIcon() {
+    if (isPlaying) {
+      return (Icon(Icons.pause));
+    } else {
+      return (Icon(Icons.play_arrow));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Sensor Player ',
@@ -104,9 +135,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      floatingActionButton: new FloatingActionButton(
-          child: isPlaying ? Icon(Icons.pause) : Icon(Icons.play_arrow),
-          onPressed: stopOrResume),
+      floatingActionButton:
+          new FloatingActionButton(child: playIcon(), onPressed: stopOrResume),
     );
   }
 

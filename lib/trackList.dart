@@ -22,13 +22,7 @@ class TrackList extends StatelessWidget {
               return ListTile(
                 title: Text('${items[index]}',
                     style: TextStyle(fontFamily: 'FredokaOne')),
-                onTap: () {
-                  MyHomePage my = MyHomePage();
-
-                  my.setName(items[index]);
-                  // my.s = true;
-                  return my.s = true;
-                },
+                    //onTap: (),
               );
             },
             separatorBuilder: (BuildContext context, int index) =>
