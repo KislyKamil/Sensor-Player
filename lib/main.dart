@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
@@ -52,7 +54,6 @@ class _MyHomePageState extends State<MyHomePage> {
     audioComplete();
     audioPosition();
     audioDuration();
-
   }
 
   void listInit() {
@@ -71,17 +72,8 @@ class _MyHomePageState extends State<MyHomePage> {
     audioPlayer.onAudioPositionChanged.listen((Duration p) {
       print('Current position: $p');
       setState(() => position = p);
-
     });
   }
-
-  /*onComplete(int index) async {
-
-    audioPlayer.play('${dir.path}${items[index]}.mp3',
-        isLocal: true, volume: 1.0);
-  }
-
-   */
 
   audioComplete() {
     audioPlayer.onPlayerCompletion.listen((event) {
@@ -107,20 +99,18 @@ class _MyHomePageState extends State<MyHomePage> {
       isPlaying ? isPlaying = false : isPlaying = true;
       loadMusic(startingPoint);
     });
-
   }
 
-  playIcon() {
-    if (isPlaying) {
-      return (Icon(Icons.pause));
-    } else {
-      return (Icon(Icons.play_arrow));
-    }
+  void stopPlaying() {
+    setState(() {
+      if (audioPlayer.state != AudioPlayerState.STOPPED)
+        isPlaying ? isPlaying = false : isPlaying = true;
+      audioPlayer.stop();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Sensor Player ',
@@ -135,8 +125,34 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      floatingActionButton:
-          new FloatingActionButton(child: playIcon(), onPressed: stopOrResume),
+      body: Center(
+        child: ButtonBar(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            FloatingActionButton(
+              child: Icon(Icons.skip_previous),
+              backgroundColor: Colors.blueAccent,
+              onPressed: null,
+              heroTag: 'btn1',
+            ),
+            FloatingActionButton(
+                child: playIcon(),
+                backgroundColor: Colors.blueAccent,
+                onPressed: stopOrResume,
+                heroTag: 'btn2'),
+            FloatingActionButton(
+                child: Icon(Icons.skip_next),
+                backgroundColor: Colors.blueAccent,
+                onPressed: null,
+                heroTag: 'btn3'),
+            FloatingActionButton(
+                child: Icon(Icons.stop),
+                backgroundColor: Colors.indigo,
+                onPressed: stopPlaying,
+                heroTag: 'btn4'),
+          ],
+        ),
+      ),
     );
   }
 
@@ -149,5 +165,13 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       },
     ));
+  }
+
+  playIcon() {
+    if (isPlaying) {
+      return (Icon(Icons.pause));
+    } else {
+      return (Icon(Icons.play_arrow));
+    }
   }
 }
