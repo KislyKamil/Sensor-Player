@@ -25,6 +25,7 @@ dependencies:
   path_provider: ^1.6.7
   path: ^1.6.4
   flutter_visualizers: ^0.0.1
+  sensors: ^0.4.2
 
 
 

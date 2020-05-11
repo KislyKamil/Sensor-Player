@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter/services.dart';
+import 'package:sensors/sensors.dart';
 
 import 'dart:async';
 import 'dart:io';
@@ -37,7 +37,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static Directory dir = Directory('/storage/sdcard1/muisc/');
+  // IF music files are on other storage than sdcard1, it is required to change path manually!!
+  static Directory dir = Directory('/storage/sdcard1/Music/');
   static List<FileSystemEntity> files = dir.listSync();
   final List<String> items = [];
 
@@ -52,8 +53,9 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     listInit();
     audioComplete();
-    audioPosition();
-    audioDuration();
+
+    ///audioPosition();
+    // audioDuration();
   }
 
   void listInit() {
@@ -65,14 +67,18 @@ class _MyHomePageState extends State<MyHomePage> {
     audioPlayer.onDurationChanged.listen((Duration d) {
       print('Max duration: $d');
       setState(() => duration = d);
+
     });
+
   }
 
-  audioPosition() async {
+   audioPosition() async {
     audioPlayer.onAudioPositionChanged.listen((Duration p) {
       print('Current position: $p');
       setState(() => position = p);
+
     });
+
   }
 
   audioComplete() {
@@ -109,6 +115,24 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void nextTrack() {
+    setState(() {
+      startingPoint++;
+      loadMusic(startingPoint);
+    });
+  }
+
+  void previousTrack() {
+    if (startingPoint > 0) {
+      setState(() {
+        startingPoint--;
+        loadMusic(startingPoint);
+      });
+    } else {
+      setState(() => loadMusic(0));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,35 +149,76 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: Center(
-        child: ButtonBar(
-          mainAxisSize: MainAxisSize.min,
+      body: Column(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+        new Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'A',
+
+                style: new TextStyle(fontSize:12.0,
+                    color: const Color(0xFF000000),
+                    fontWeight: FontWeight.w200,
+                    fontFamily: "Roboto"),
+              ),
+              Text(
+                'B',
+                style: new TextStyle(fontSize:12.0,
+                    color: const Color(0xFF000000),
+                    fontWeight: FontWeight.w200,
+                    fontFamily: "Roboto"),
+              )
+            ]
+
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            FloatingActionButton(
-              child: Icon(Icons.skip_previous),
-              backgroundColor: Colors.blueAccent,
-              onPressed: null,
-              heroTag: 'btn1',
+            Center(
+              child: ButtonBar(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  FloatingActionButton(
+                    child: Icon(Icons.skip_previous),
+                    backgroundColor: Colors.blueAccent,
+                    onPressed: previousTrack,
+                    heroTag: 'btn1',
+                  ),
+                  FloatingActionButton(
+                      child: playIcon(),
+                      backgroundColor: Colors.blueAccent,
+                      onPressed: stopOrResume,
+                      heroTag: 'btn2'),
+                  FloatingActionButton(
+                      child: Icon(Icons.skip_next),
+                      backgroundColor: Colors.blueAccent,
+                      onPressed: nextTrack,
+                      heroTag: 'btn3'),
+                  FloatingActionButton(
+                    child: Icon(Icons.stop),
+                    backgroundColor: Colors.indigo,
+                    onPressed: stopPlaying,
+                    heroTag: 'btn4',
+                  ),
+                ],
+              ),
             ),
-            FloatingActionButton(
-                child: playIcon(),
-                backgroundColor: Colors.blueAccent,
-                onPressed: stopOrResume,
-                heroTag: 'btn2'),
-            FloatingActionButton(
-                child: Icon(Icons.skip_next),
-                backgroundColor: Colors.blueAccent,
-                onPressed: null,
-                heroTag: 'btn3'),
-            FloatingActionButton(
-                child: Icon(Icons.stop),
-                backgroundColor: Colors.indigo,
-                onPressed: stopPlaying,
-                heroTag: 'btn4'),
           ],
         ),
-      ),
+      ]),
     );
+  }
+  String currentPosition(){
+
+  }
+  String audioLength(){
+
+    audioDuration();
+
   }
 
   showList() {
