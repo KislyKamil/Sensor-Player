@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sensors/sensors.dart';
+import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:sensorplayer/trackList.dart';
 
@@ -39,11 +39,16 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   // IF music files are on other storage than sdcard1, it is required to change path manually!!
   static Directory dir = Directory('/storage/sdcard1/Music/');
+  static Directory phoneDir = Directory('/storage/emulated/0/Music/');
+  // -->
   static List<FileSystemEntity> files = dir.listSync();
+  static List<FileSystemEntity> phoneFiles = phoneDir.listSync();
   final List<String> items = [];
+  final List<String> itemsPhone = [];
 
   bool isPlaying = false;
-  Duration duration, position;
+  Duration duration = Duration(minutes: 0, seconds: 0);
+  Duration position = Duration(minutes: 0, seconds: 0);
   int startingPoint = 0;
 
   AudioPlayer audioPlayer = AudioPlayer();
@@ -53,32 +58,16 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     listInit();
     audioComplete();
-
-    ///audioPosition();
-    // audioDuration();
+    audioPosition();
+    audioDuration();
   }
 
   void listInit() {
     files.forEach((f) =>
         items.add(f.path.substring(23).replaceAll(RegExp('([.]mp3)'), '')));
-  }
 
-  audioDuration() async {
-    audioPlayer.onDurationChanged.listen((Duration d) {
-      print('Max duration: $d');
-      setState(() => duration = d);
-
-    });
-
-  }
-
-   audioPosition() async {
-    audioPlayer.onAudioPositionChanged.listen((Duration p) {
-      print('Current position: $p');
-      setState(() => position = p);
-
-    });
-
+    phoneFiles.forEach((f) => itemsPhone
+        .add(f.path.substring(23).replaceAll(RegExp('([.]mp3)'), '')));
   }
 
   audioComplete() {
@@ -108,15 +97,23 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void stopPlaying() {
-    setState(() {
-      if (audioPlayer.state != AudioPlayerState.STOPPED)
+    if (isPlaying) {
+      setState(() {
         isPlaying ? isPlaying = false : isPlaying = true;
-      audioPlayer.stop();
-    });
+        position = Duration(minutes: 0, seconds: 0);
+        audioPlayer.stop();
+      });
+    }
+  }
+
+  void resetDuration() {
+    duration = Duration(minutes: 0, seconds: 0);
+    position = Duration(minutes: 0, seconds: 0);
   }
 
   void nextTrack() {
     setState(() {
+      resetDuration();
       startingPoint++;
       loadMusic(startingPoint);
     });
@@ -125,6 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void previousTrack() {
     if (startingPoint > 0) {
       setState(() {
+        resetDuration();
         startingPoint--;
         loadMusic(startingPoint);
       });
@@ -135,6 +133,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    print('DURATION = $duration');
+    print('POSITION = $position');
+    print('STATE = ${audioPlayer.state}');
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Sensor Player ',
@@ -150,28 +153,44 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: Column(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-        new Row(
+        Row(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                'A',
-
-                style: new TextStyle(fontSize:12.0,
-                    color: const Color(0xFF000000),
+                '${position.inMinutes}:${position.inSeconds - position.inMinutes * 60} /',
+                style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.teal,
                     fontWeight: FontWeight.w200,
-                    fontFamily: "Roboto"),
+                    fontFamily: "Sriracha"),
               ),
               Text(
-                'B',
-                style: new TextStyle(fontSize:12.0,
-                    color: const Color(0xFF000000),
+                ' ${duration.inMinutes}:${duration.inSeconds - duration.inMinutes * 60}',
+                style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.teal,
                     fontWeight: FontWeight.w200,
-                    fontFamily: "Roboto"),
+                    fontFamily: "Sriracha"),
               )
-            ]
-
+            ]),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            StepProgressIndicator(
+              direction: Axis.horizontal,
+              fallbackLength: width - 10,
+              totalSteps: (duration.inSeconds > 0) ? duration.inSeconds : 10,
+              currentStep: (position.inSeconds > 0) ? position.inSeconds : 0,
+              size: 5,
+              padding: 0,
+              selectedColor: Colors.redAccent,
+              unselectedColor: Colors.black12,
+              roundedEdges: Radius.circular(10),
+            ),
+          ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -212,13 +231,19 @@ class _MyHomePageState extends State<MyHomePage> {
       ]),
     );
   }
-  String currentPosition(){
 
+  audioDuration() async {
+    audioPlayer.onDurationChanged.listen((Duration d) {
+      print('Max duration: $d');
+      setState(() => duration = d);
+    });
   }
-  String audioLength(){
 
-    audioDuration();
-
+  audioPosition() async {
+    audioPlayer.onAudioPositionChanged.listen((Duration p) {
+      print('Current position: $p');
+      setState(() => position = p);
+    });
   }
 
   showList() {

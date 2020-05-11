@@ -26,6 +26,7 @@ dependencies:
   path: ^1.6.4
   flutter_visualizers: ^0.0.1
   sensors: ^0.4.2
+  step_progress_indicator: ^0.2.2+5
 
 
 
@@ -53,9 +54,6 @@ flutter:
     - family: PermanentMarker
       fonts:
         - asset: assets/PermanentMarker-Regular.ttf
-    - family: ShadowsIntoLight
-      fonts:
-        - asset: assets/ShadowsIntoLight-Regular.ttf
     - family: Bangers
       fonts:
         - asset: assets/Bangers-Regular.ttf
