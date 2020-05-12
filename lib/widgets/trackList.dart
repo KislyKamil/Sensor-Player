@@ -10,7 +10,7 @@ class TrackList extends StatelessWidget {
     this.items = items;
   }
   static Directory dir = Directory('/storage/sdcard1/muisc');
-  List<String> items = [];
+  List<String> items;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class TrackList extends StatelessWidget {
               return ListTile(
                 title: Text('${items[index]}',
                     style: TextStyle(fontFamily: 'FredokaOne')),
-                    //onTap: (),
+                //onTap: (),
               );
             },
             separatorBuilder: (BuildContext context, int index) =>

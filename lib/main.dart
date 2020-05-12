@@ -5,11 +5,9 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:sensors/sensors.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 
-import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
-import 'package:sensorplayer/trackList.dart';
+import 'package:sensorplayer/widgets/trackList.dart';
 
 void main() {
   runApp(MyApp());
@@ -39,7 +37,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   // IF music files are on other storage than sdcard1, it is required to change path manually!!
   static Directory dir = Directory('/storage/sdcard1/Music/');
-  static Directory phoneDir = Directory('/storage/emulated/0/Music/');
+  static Directory phoneDir = Directory('/storage/sdcard0/Music/');
   // -->
   static List<FileSystemEntity> files = dir.listSync();
   static List<FileSystemEntity> phoneFiles = phoneDir.listSync();
@@ -50,6 +48,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Duration duration = Duration(minutes: 0, seconds: 0);
   Duration position = Duration(minutes: 0, seconds: 0);
   int startingPoint = 0;
+  int maxIndex;
+  bool isOn = true;
 
   AudioPlayer audioPlayer = AudioPlayer();
 
@@ -60,19 +60,29 @@ class _MyHomePageState extends State<MyHomePage> {
     audioComplete();
     audioPosition();
     audioDuration();
+    printAxis();
   }
 
   void listInit() {
-    files.forEach((f) =>
-        items.add(f.path.substring(23).replaceAll(RegExp('([.]mp3)'), '')));
-
-    phoneFiles.forEach((f) => itemsPhone
-        .add(f.path.substring(23).replaceAll(RegExp('([.]mp3)'), '')));
+    if (files != null) {
+      files.forEach((f) =>
+          items.add(f.path.substring(23).replaceAll(RegExp('([.]mp3)'), '')));
+      maxIndex = items.length;
+    } else {
+      if (phoneFiles != null) {
+        phoneFiles.forEach((f) => itemsPhone
+            .add(f.path.substring(23).replaceAll(RegExp('([.]mp3)'), '')));
+        maxIndex = itemsPhone.length;
+      }
+    }
   }
 
   audioComplete() {
     audioPlayer.onPlayerCompletion.listen((event) {
       startingPoint++;
+      if (startingPoint == maxIndex) {
+        startingPoint = 0;
+      }
       loadMusic(startingPoint);
       setState(() {
         position = duration;
@@ -81,11 +91,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   loadMusic(int index) async {
-    if (isPlaying) {
-      audioPlayer.play('${dir.path}${items[index]}.mp3',
-          isLocal: true, volume: 1.0);
+    if (items.length > 0) {
+      if (isPlaying) {
+        audioPlayer.play('${dir.path}${items[index]}.mp3',
+            isLocal: true, volume: 1.0);
+      } else {
+        audioPlayer.pause();
+      }
     } else {
-      audioPlayer.pause();
+      if (isPlaying) {
+        audioPlayer.play('${phoneDir.path}${itemsPhone[index]}.mp3',
+            isLocal: true, volume: 1.0);
+      } else {
+        audioPlayer.pause();
+      }
     }
   }
 
@@ -103,6 +122,11 @@ class _MyHomePageState extends State<MyHomePage> {
         position = Duration(minutes: 0, seconds: 0);
         audioPlayer.stop();
       });
+    } else if (!isPlaying) {
+      setState(() {
+        position = Duration(minutes: 0, seconds: 0);
+        audioPlayer.stop();
+      });
     }
   }
 
@@ -114,7 +138,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void nextTrack() {
     setState(() {
       resetDuration();
-      startingPoint++;
+      if (startingPoint == maxIndex - 1) {
+        startingPoint = 0;
+      } else {
+        startingPoint++;
+      }
       loadMusic(startingPoint);
     });
   }
@@ -127,7 +155,11 @@ class _MyHomePageState extends State<MyHomePage> {
         loadMusic(startingPoint);
       });
     } else {
-      setState(() => loadMusic(0));
+      setState(() {
+        resetDuration();
+        startingPoint = maxIndex - 1;
+        loadMusic(startingPoint);
+      });
     }
   }
 
@@ -153,6 +185,24 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: Column(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+        Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              RaisedButton(
+                  key: null,
+                  onPressed: setSensors,
+                  color: const Color(0xFFe0e0e0),
+                  child: Text(
+                    isOn ? 'Sensors ON' : 'Sensors OFF',
+                    style: TextStyle(
+                        fontSize: 12.0,
+                        color: Color(0xFF000000),
+                        fontWeight: FontWeight.w200,
+                        fontFamily: "Sriracha"),
+                  ))
+            ]),
         Row(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -263,5 +313,21 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       return (Icon(Icons.play_arrow));
     }
+  }
+
+  printAxis() async{
+    userAccelerometerEvents.listen((UserAccelerometerEvent event) {
+      print(event);
+      if (isOn) {
+        if (event.x > 6.0) previousTrack();
+
+        if (event.x < -6.0) nextTrack();
+      }
+    });
+    //[UserAccelerometerEvent (x: 0.0, y: 0.0, z: 0.0)]
+  }
+
+  setSensors() {
+    setState(() => isOn ? isOn = false : isOn = true);
   }
 }
