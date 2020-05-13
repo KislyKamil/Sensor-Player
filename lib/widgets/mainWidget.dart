@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sensorplayer/player_service/player.dart';
@@ -7,9 +6,6 @@ import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 import 'package:all_sensors/all_sensors.dart';
 import 'package:sensorplayer/widgets/trackList.dart';
-import 'package:path_provider_ex/path_provider_ex.dart';
-
-
 
 class MainWidget extends StatefulWidget {
   MainWidget({Key key, this.title, this.player}) : super(key: key);
@@ -18,12 +14,12 @@ class MainWidget extends StatefulWidget {
   Player player;
 
   @override
-  _MainWidgetState createState() => _MainWidgetState(player: player, maxIndex: player.maxIndex);
+  _MainWidgetState createState() =>
+      _MainWidgetState(player: player, maxIndex: player.maxIndex);
 }
 
 class _MainWidgetState extends State<MainWidget> {
   _MainWidgetState({@required this.player, @required this.maxIndex});
-
 
   Duration duration = Duration(minutes: 0, seconds: 0);
   Duration position = Duration(minutes: 0, seconds: 0);
@@ -32,14 +28,11 @@ class _MainWidgetState extends State<MainWidget> {
   double xAxis, yAxis, zAxis;
   int counter = 0;
 
-
   bool isPlaying = false;
   bool isOn = true;
   bool isProximity = false;
 
-
   Player player;
-
 
   @override
   initState() {
@@ -60,6 +53,7 @@ class _MainWidgetState extends State<MainWidget> {
       });
     });
   }
+
   void stopPlayingState() {
     if (isPlaying) {
       setState(() {
@@ -79,7 +73,6 @@ class _MainWidgetState extends State<MainWidget> {
     duration = Duration(minutes: 0, seconds: 0);
     position = Duration(minutes: 0, seconds: 0);
   }
-
 
   audioCompleteState() {
     player.audioPlayer.onPlayerCompletion.listen((event) {
@@ -101,7 +94,6 @@ class _MainWidgetState extends State<MainWidget> {
     });
   }
 
-
   nextTrack() {
     setState(() {
       resetDuration();
@@ -110,11 +102,11 @@ class _MainWidgetState extends State<MainWidget> {
       } else {
         startingPoint++;
       }
-     player.loadMusic(startingPoint, isPlaying);
+      player.loadMusic(startingPoint, isPlaying);
     });
   }
 
-   previousTrack() {
+  previousTrack() {
     if (startingPoint > 0) {
       setState(() {
         resetDuration();
@@ -129,8 +121,6 @@ class _MainWidgetState extends State<MainWidget> {
       });
     }
   }
-
-
 
   allowProximity() {
     if (isProximity) {
@@ -155,7 +145,6 @@ class _MainWidgetState extends State<MainWidget> {
         player.loadMusic(startingPoint, isPlaying);
       });
     }
-
 
     return Scaffold(
       appBar: AppBar(
@@ -191,7 +180,7 @@ class _MainWidgetState extends State<MainWidget> {
                   )),
             ]),
 
-       /* UNCOMMENT TO SHOW AXIS AND PROXIMITY
+        /* UNCOMMENT TO SHOW AXIS AND PROXIMITY
        Row(
           children: <Widget>[
             Text('Proximity = $isProximity'),
@@ -212,13 +201,12 @@ class _MainWidgetState extends State<MainWidget> {
             Text('Z = $zAxis'),
           ],
         ),
+        */
         Row(
           children: <Widget>[
             Text('${player.items[startingPoint]}'),
           ],
         ),
-        */
-
         Row(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -361,11 +349,10 @@ class _MainWidgetState extends State<MainWidget> {
         zAxis = event.z;
       });
     });
-    //[UserAccelerometerEvent (x: 0.0, y: 0.0, z: 0.0)]
+    //[AccelerometerEvent (x: 0.0, y: 0.0, z: 0.0)]
   }
 
   setSensorsState() {
     setState(() => isOn ? isOn = false : isOn = true);
   }
-
 }
