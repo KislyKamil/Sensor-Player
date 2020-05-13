@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'dart:async';
-import 'package:sensorplayer/main.dart';
-
-import 'package:audioplayers/audioplayers.dart';
 
 class TrackList extends StatelessWidget {
   TrackList({Key key, @required List<String> items}) : super(key: key) {
