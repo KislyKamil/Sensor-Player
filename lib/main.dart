@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Sensor Player',
       home: MainWidget(
         title: 'Sensor Player',
-        player: Player(items: songs.items, maxIndex: songs.maxIndex),
+        player: Player(items: songs.getItems, maxIndex: songs.maxIndex),
       ),
     );
   }

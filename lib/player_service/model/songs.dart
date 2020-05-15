@@ -10,8 +10,8 @@ class Songs {
   // -->
   List<FileSystemEntity> files; // = dir.listSync();
   List<FileSystemEntity> phoneFiles; // = phoneDir.listSync();
-  final List<String> items = [];
-  final List<String> itemsPhone = [];
+  final List<String> _items = [];
+  final List<String> _itemsPhone = [];
   int maxIndex;
   bool isCard = true;
 
@@ -25,21 +25,25 @@ class Songs {
     }
   }
 
+  List<String> get getItems {
+    return _items;
+  }
+
   listInit() async {
     checkDir();
     if (files != null) {
       files.forEach((f) =>
-          items.add(f.path.substring(23).replaceAll(RegExp('([.]mp3)'), '')));
-      maxIndex = items.length;
+          _items.add(f.path.substring(23).replaceAll(RegExp('([.]mp3)'), '')));
+      maxIndex = _items.length;
     } else {
       isCard = false;
       if (phoneFiles != null) {
-        phoneFiles.forEach((f) => itemsPhone
+        phoneFiles.forEach((f) => _itemsPhone
             .add(f.path.substring(23).replaceAll(RegExp('([.]mp3)'), '')));
-        maxIndex = itemsPhone.length;
+        maxIndex = _itemsPhone.length;
       }
     }
-    items.addAll(itemsPhone);
-    return items;
+    _items.addAll(_itemsPhone);
+    return _items;
   }
 }
