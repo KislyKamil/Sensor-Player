@@ -8,7 +8,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  Songs songs = Songs();
+  final Songs songs = Songs();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Sensor Player',
       home: MainWidget(
         title: 'Sensor Player',
-        player: Player(items: songs.getItems, maxIndex: songs.maxIndex),
+        player: Player(items: songs.getItems, maxIndex: songs.maxIndex, songs: songs),
       ),
     );
   }

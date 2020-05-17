@@ -29,6 +29,10 @@ class Songs {
     return _items;
   }
 
+  String get getDir => dir.path;
+
+  String get getPhoneDir => phoneDir.path;
+
   listInit() async {
     checkDir();
     if (files != null) {

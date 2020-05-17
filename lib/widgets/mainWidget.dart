@@ -206,8 +206,6 @@ class _MainWidgetState extends State<MainWidget> {
             Text('${player.items[startingPoint]}'),
           ],
         ),
-
-
         Row(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -324,7 +322,7 @@ class _MainWidgetState extends State<MainWidget> {
     sens.accelerometerEvents.listen((sens.AccelerometerEvent event) {
       print(event);
       if (isOn) {
-        if (event.x > 5.7 && event.y < 5 && counter == 0 ) {
+        if (event.x > 5.7 && event.y < 5 && counter == 0) {
           previousTrack();
           setState(() {
             counter = 1;
