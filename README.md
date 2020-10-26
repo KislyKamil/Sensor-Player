@@ -1,4 +1,4 @@
 
 # sensorplayer
 
-Music player, with sensors navigatio
+Music player, with sensors navigation
