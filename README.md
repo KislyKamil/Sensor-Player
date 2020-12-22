@@ -1,8 +1,8 @@
 
 # sensorplayer
 
-Music player, with UI and sensors (accelerometer) navigation.
+Music player mobile app which allows to navigate with traditional UI and also sensors (accelerometer and proximity sensors).
 
 # Stack
 
-Dart with Flutter framework.
+App was made in Dart with Flutter framework.
